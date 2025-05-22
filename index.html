@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Reakční hra – Přihlášení žáků</title>
+  <title>Reakční hra s výsledky</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,8 +21,21 @@
     }
     #result {
       font-size: 24px;
-      margin-top: 30px;
+      margin-top: 20px;
       color: green;
+    }
+    table {
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 50%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      font-size: 16px;
+    }
+    th {
+      background-color: #f0f0f0;
     }
   </style>
 </head>
@@ -43,9 +56,22 @@
 
   <div id="result"></div>
 
+  <table id="resultsTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>Jméno</th>
+        <th>Reakční čas (ms)</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody">
+    </tbody>
+  </table>
+
   <script>
     let players = [];
     let winner = null;
+    let startTime = 0;
+    let clickedPlayers = new Set();
 
     function registerPlayer() {
       const name = document.getElementById('playerName').value.trim();
@@ -63,4 +89,40 @@
 
     function startGame() {
       winner = null;
-      document.getElementById('result').te
+      clickedPlayers.clear();
+      document.getElementById('result').textContent = "Hra běží! Kdo bude nejrychlejší?";
+      document.getElementById('resultsTable').style.display = 'none';
+      document.getElementById('resultsBody').innerHTML = '';
+
+      players.forEach(name => {
+        const btn = document.getElementById(`btn-${name}`);
+        if (btn) btn.disabled = false;
+      });
+
+      startTime = performance.now();
+    }
+
+    function press(name) {
+      const currentTime = performance.now();
+      const reactionTime = Math.round(currentTime - startTime);
+
+      if (clickedPlayers.has(name)) return; // Zabránit vícenásobnému kliknutí
+      clickedPlayers.add(name);
+
+      if (!winner) {
+        winner = name;
+        document.getElementById('result').textContent = `${name} byl nejrychlejší! 🎉 (${reactionTime} ms)`;
+      }
+
+      const btn = document.getElementById(`btn-${name}`);
+      if (btn) btn.disabled = true;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${name}</td><td>${reactionTime}</td>`;
+      document.getElementById('resultsBody').appendChild(row);
+      document.getElementById('resultsTable').style.display = 'table';
+    }
+  </script>
+
+</body>
+</html>
