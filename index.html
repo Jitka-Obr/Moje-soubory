@@ -2,17 +2,22 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Kdo byl nejrychlejší?</title>
+  <title>Reakční hra – Přihlášení žáků</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 30px;
     }
-    button {
-      padding: 15px 30px;
-      margin: 10px;
-      font-size: 18px;
+    input, button {
+      font-size: 16px;
+      padding: 10px;
+      margin: 5px;
+    }
+    #players button {
+      display: block;
+      margin: 10px auto;
+      width: 200px;
     }
     #result {
       font-size: 24px;
@@ -25,43 +30,37 @@
 
   <h1>Reakční hra – Kdo byl nejrychlejší?</h1>
 
-  <button onclick="startGame()">Start</button>
-
-  <div id="buttons">
-    <button onclick="press('Žák 1')" id="btn1" disabled>Žák 1</button>
-    <button onclick="press('Žák 2')" id="btn2" disabled>Žák 2</button>
-    <button onclick="press('Žák 3')" id="btn3" disabled>Žák 3</button>
-    <button onclick="press('Žák 4')" id="btn4" disabled>Žák 4</button>
+  <div>
+    <input type="text" id="playerName" placeholder="Zadej své jméno">
+    <button onclick="registerPlayer()">Přihlásit se</button>
   </div>
+
+  <div>
+    <button onclick="startGame()">Start hra</button>
+  </div>
+
+  <div id="players"></div>
 
   <div id="result"></div>
 
   <script>
+    let players = [];
     let winner = null;
+
+    function registerPlayer() {
+      const name = document.getElementById('playerName').value.trim();
+      if (name && !players.includes(name)) {
+        players.push(name);
+        const btn = document.createElement('button');
+        btn.textContent = name;
+        btn.onclick = () => press(name);
+        btn.disabled = true;
+        btn.id = `btn-${name}`;
+        document.getElementById('players').appendChild(btn);
+        document.getElementById('playerName').value = '';
+      }
+    }
 
     function startGame() {
       winner = null;
-      document.getElementById('result').textContent = "Hra začala! Kdo bude nejrychlejší?";
-      
-      // Povolit všechna tlačítka
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById('btn' + i).disabled = false;
-      }
-    }
-
-    function press(name) {
-      if (!winner) {
-        winner = name;
-        document.getElementById('result').textContent = `${name} byl nejrychlejší! 🎉`;
-        
-        // Zakázat všechna tlačítka
-        for (let i = 1; i <= 4; i++) {
-          document.getElementById('btn' + i).disabled = true;
-        }
-      }
-    }
-  </script>
-
-</body>
-</html>
-
+      document.getElementById('result').te
