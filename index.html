@@ -2,33 +2,61 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Moje první webová stránka</title>
+  <title>Reakční tlačítko - Riskuj</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 50px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      margin: 10px;
+    }
+    #message {
+      font-size: 24px;
+      margin: 20px;
+      color: green;
+    }
+  </style>
 </head>
 <body>
 
-  <h1>Připraveni?</h1>
-  <p>Stačí jen znát odpověď a být nejrychlejší.</p>
+  <h1>Reakční hra - Riskuj styl</h1>
+
+  <button onclick="startGame()">Start</button>
+  <button id="reactBtn" onclick="react()" disabled>Reaguj!</button>
+
+  <div id="message"></div>
+
+  <script>
+    let startTime = 0;
+    let timeoutId;
+
+    function startGame() {
+      document.getElementById('message').textContent = "Připrav se...";
+      document.getElementById('reactBtn').disabled = true;
+
+      const delay = Math.random() * 4000 + 1000; // 1000–5000 ms
+      timeoutId = setTimeout(() => {
+        document.getElementById('message').textContent = "Teď!";
+        document.getElementById('reactBtn').disabled = false;
+        startTime = performance.now();
+      }, delay);
+    }
+
+    function react() {
+      if (startTime === 0) return;
+
+      const reactionTime = (performance.now() - startTime).toFixed(0);
+      document.getElementById('message').textContent = `Tvoje reakce: ${reactionTime} ms`;
+
+      document.getElementById('reactBtn').disabled = true;
+      startTime = 0;
+    }
+  </script>
 
 </body>
 </html>
-
-<script>
-  function ukazZpravu() {
-    alert("Kliknutí funguje!");
-  }
-</script>
-
-<button onclick="ukazZpravu()">Klikni mě</button>
-<h2>Přihlášení</h2>
-<form onsubmit="zobrazUvitani(); return false;">
-  <input type="text" id="jmeno" placeholder="Zadej své jméno">
-  <button type="submit">Přihlásit se</button>
-</form>
-
-<script>
-  function zobrazUvitani() {
-    const jmeno = document.getElementById('jmeno').value;
-    alert("Vítej, " + jmeno + "!");
-  }
-</script>
 
