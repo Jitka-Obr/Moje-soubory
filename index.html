@@ -2,58 +2,63 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Reakční tlačítko - Riskuj</title>
+  <title>Kdo byl nejrychlejší?</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 50px;
+      padding: 50px;
     }
     button {
       padding: 15px 30px;
-      font-size: 18px;
       margin: 10px;
+      font-size: 18px;
     }
-    #message {
+    #result {
       font-size: 24px;
-      margin: 20px;
+      margin-top: 30px;
       color: green;
     }
   </style>
 </head>
 <body>
 
-  <h1>Reakční hra - Riskuj styl</h1>
+  <h1>Reakční hra – Kdo byl nejrychlejší?</h1>
 
   <button onclick="startGame()">Start</button>
-  <button id="reactBtn" onclick="react()" disabled>Reaguj!</button>
 
-  <div id="message"></div>
+  <div id="buttons">
+    <button onclick="press('Žák 1')" id="btn1" disabled>Žák 1</button>
+    <button onclick="press('Žák 2')" id="btn2" disabled>Žák 2</button>
+    <button onclick="press('Žák 3')" id="btn3" disabled>Žák 3</button>
+    <button onclick="press('Žák 4')" id="btn4" disabled>Žák 4</button>
+  </div>
+
+  <div id="result"></div>
 
   <script>
-    let startTime = 0;
-    let timeoutId;
+    let winner = null;
 
     function startGame() {
-      document.getElementById('message').textContent = "Připrav se...";
-      document.getElementById('reactBtn').disabled = true;
-
-      const delay = Math.random() * 4000 + 1000; // 1000–5000 ms
-      timeoutId = setTimeout(() => {
-        document.getElementById('message').textContent = "Teď!";
-        document.getElementById('reactBtn').disabled = false;
-        startTime = performance.now();
-      }, delay);
+      winner = null;
+      document.getElementById('result').textContent = "Hra začala! Kdo bude nejrychlejší?";
+      
+      // Povolit všechna tlačítka
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById('btn' + i).disabled = false;
+      }
     }
 
-    function react() {
-      if (startTime === 0) return;
-
-      const reactionTime = (performance.now() - startTime).toFixed(0);
-      document.getElementById('message').textContent = `Tvoje reakce: ${reactionTime} ms`;
-
-      document.getElementById('reactBtn').disabled = true;
-      startTime = 0;
+    function press(name) {
+      if (!winner) {
+        winner = name;
+        document.getElementById('result').textContent = `${name} byl nejrychlejší! 🎉`;
+        
+        // Zakázat všechna tlačítka
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById('btn' + i).disabled = true;
+        }
+      }
     }
   </script>
 
