@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Reakční hra – Více kol + pořadí</title>
+  <title>Reakční hra – bez přihlášení učitele</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,10 +14,17 @@
       padding: 10px;
       margin: 5px;
     }
+    #players {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
     #players button {
-      display: block;
-      margin: 10px auto;
-      width: 200px;
+      min-width: 150px;
+      padding: 15px;
+      font-size: 16px;
     }
     #result {
       font-size: 24px;
@@ -43,25 +50,21 @@
 
   <h1>Reakční hra – Kdo byl nejrychlejší?</h1>
 
+  <!-- Registrace žáků -->
   <div>
     <input type="text" id="playerName" placeholder="Zadej své jméno">
     <button onclick="registerPlayer()">Přihlásit se</button>
   </div>
 
-  <hr>
-
-  <div id="teacherSection">
-    <input type="password" id="teacherPassword" placeholder="Heslo učitele">
-    <button onclick="authorizeTeacher()">Přihlásit učitele</button>
-  </div>
-
-  <div>
-    <button id="startButton" onclick="startGame()" disabled>Start hra</button>
-    <button id="nextRoundButton" onclick="newRound()" disabled>Nové kolo</button>
+  <!-- Tlačítka pro učitele -->
+  <div style="margin-top: 20px;">
+    <button id="startButton" onclick="startGame()">Start hra</button>
+    <button id="nextRoundButton" onclick="newRound()">Nové kolo</button>
   </div>
 
   <h3 id="roundDisplay">Kolo: 1</h3>
 
+  <!-- Tlačítka hráčů -->
   <div id="players"></div>
 
   <div id="result"></div>
@@ -83,7 +86,6 @@
     let hasClicked = false;
     let clickedPlayers = new Set();
     let round = 1;
-    const teacherPassword = "tajne";
     let roundResults = [];
 
     function registerPlayer() {
@@ -97,17 +99,6 @@
         btn.id = `btn-${name}`;
         document.getElementById('players').appendChild(btn);
         document.getElementById('playerName').value = '';
-      }
-    }
-
-    function authorizeTeacher() {
-      const input = document.getElementById('teacherPassword').value.trim();
-      if (input === teacherPassword) {
-        document.getElementById('startButton').disabled = false;
-        document.getElementById('nextRoundButton').disabled = false;
-        document.getElementById('teacherSection').innerHTML = "<p><strong>Učitel přihlášen ✅</strong></p>";
-      } else {
-        alert("Nesprávné heslo.");
       }
     }
 
@@ -128,4 +119,57 @@
       startTime = performance.now();
     }
 
-    function
+    function press(name) {
+      const currentTime = performance.now();
+      const reactionTime = Math.round(currentTime - startTime);
+
+      if (clickedPlayers.has(name)) return;
+      clickedPlayers.add(name);
+
+      roundResults.push({ name, time: reactionTime });
+
+      if (!hasClicked) {
+        hasClicked = true;
+        document.getElementById('result').textContent =
+          `${name} byl nejrychlejší! 🎉 (${reactionTime} ms)`;
+
+        players.forEach(p => {
+          const btn = document.getElementById(`btn-${p}`);
+          if (btn) btn.disabled = true;
+        });
+      }
+
+      showResultsTable();
+    }
+
+    function showResultsTable() {
+      const tbody = document.getElementById('resultsBody');
+      tbody.innerHTML = "";
+
+      const sorted = [...roundResults].sort((a, b) => a.time - b.time);
+
+      sorted.forEach((entry, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${index + 1}</td><td>${entry.name}</td><td>${entry.time}</td>`;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById('resultsTable').style.display = 'table';
+    }
+
+    function newRound() {
+      round++;
+      document.getElementById('roundDisplay').textContent = `Kolo: ${round}`;
+      document.getElementById('result').textContent = "";
+      document.getElementById('resultsBody').innerHTML = "";
+      document.getElementById('resultsTable').style.display = 'none';
+
+      players.forEach(name => {
+        const btn = document.getElementById(`btn-${name}`);
+        if (btn) btn.disabled = true;
+      });
+    }
+  </script>
+
+</body>
+</html>
