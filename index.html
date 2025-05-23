@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Reakční hra s výsledky</title>
+  <title>Reakční hra – Více kol + pořadí</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,7 +27,7 @@
     table {
       margin: 30px auto;
       border-collapse: collapse;
-      width: 50%;
+      width: 60%;
     }
     th, td {
       border: 1px solid #ccc;
@@ -48,9 +48,19 @@
     <button onclick="registerPlayer()">Přihlásit se</button>
   </div>
 
-  <div>
-    <button onclick="startGame()">Start hra</button>
+  <hr>
+
+  <div id="teacherSection">
+    <input type="password" id="teacherPassword" placeholder="Heslo učitele">
+    <button onclick="authorizeTeacher()">Přihlásit učitele</button>
   </div>
+
+  <div>
+    <button id="startButton" onclick="startGame()" disabled>Start hra</button>
+    <button id="nextRoundButton" onclick="newRound()" disabled>Nové kolo</button>
+  </div>
+
+  <h3 id="roundDisplay">Kolo: 1</h3>
 
   <div id="players"></div>
 
@@ -59,19 +69,22 @@
   <table id="resultsTable" style="display: none;">
     <thead>
       <tr>
+        <th>Pořadí</th>
         <th>Jméno</th>
         <th>Reakční čas (ms)</th>
       </tr>
     </thead>
-    <tbody id="resultsBody">
-    </tbody>
+    <tbody id="resultsBody"></tbody>
   </table>
 
   <script>
     let players = [];
-    let winner = null;
     let startTime = 0;
+    let hasClicked = false;
     let clickedPlayers = new Set();
+    let round = 1;
+    const teacherPassword = "tajne";
+    let roundResults = [];
 
     function registerPlayer() {
       const name = document.getElementById('playerName').value.trim();
@@ -87,12 +100,25 @@
       }
     }
 
+    function authorizeTeacher() {
+      const input = document.getElementById('teacherPassword').value.trim();
+      if (input === teacherPassword) {
+        document.getElementById('startButton').disabled = false;
+        document.getElementById('nextRoundButton').disabled = false;
+        document.getElementById('teacherSection').innerHTML = "<p><strong>Učitel přihlášen ✅</strong></p>";
+      } else {
+        alert("Nesprávné heslo.");
+      }
+    }
+
     function startGame() {
-      winner = null;
+      hasClicked = false;
       clickedPlayers.clear();
+      roundResults = [];
+
       document.getElementById('result').textContent = "Hra běží! Kdo bude nejrychlejší?";
-      document.getElementById('resultsTable').style.display = 'none';
       document.getElementById('resultsBody').innerHTML = '';
+      document.getElementById('resultsTable').style.display = 'none';
 
       players.forEach(name => {
         const btn = document.getElementById(`btn-${name}`);
@@ -102,27 +128,4 @@
       startTime = performance.now();
     }
 
-    function press(name) {
-      const currentTime = performance.now();
-      const reactionTime = Math.round(currentTime - startTime);
-
-      if (clickedPlayers.has(name)) return; // Zabránit vícenásobnému kliknutí
-      clickedPlayers.add(name);
-
-      if (!winner) {
-        winner = name;
-        document.getElementById('result').textContent = `${name} byl nejrychlejší! 🎉 (${reactionTime} ms)`;
-      }
-
-      const btn = document.getElementById(`btn-${name}`);
-      if (btn) btn.disabled = true;
-
-      const row = document.createElement('tr');
-      row.innerHTML = `<td>${name}</td><td>${reactionTime}</td>`;
-      document.getElementById('resultsBody').appendChild(row);
-      document.getElementById('resultsTable').style.display = 'table';
-    }
-  </script>
-
-</body>
-</html>
+    function
