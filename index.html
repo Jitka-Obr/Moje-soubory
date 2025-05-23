@@ -2,7 +2,7 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-  <title>Reakční hra – s pořadím hráčů</title>
+  <title>Reakční hra – s pořadím</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -127,13 +127,22 @@
 
       roundResults.push({ name, time: reactionTime });
 
+      document.getElementById(`btn-${name}`).disabled = true;
+
       if (roundResults.length === 1) {
         document.getElementById('result').textContent =
           `${name} byl nejrychlejší! 🎉 (${reactionTime} ms)`;
       }
 
-      document.getElementById(`btn-${name}`).disabled = true;
       showResultsTable();
+
+      if (clickedPlayers.size === players.length) {
+        document.getElementById('result').textContent += " – Konec kola.";
+        players.forEach(p => {
+          const btn = document.getElementById(`btn-${p}`);
+          if (btn) btn.disabled = true;
+        });
+      }
     }
 
     function showResultsTable() {
